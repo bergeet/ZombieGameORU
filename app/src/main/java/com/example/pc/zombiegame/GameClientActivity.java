@@ -53,7 +53,7 @@ public class GameClientActivity extends AppCompatActivity {
 
 
     private ServerHandlerThread serverHandlerThread = null;
-
+    private String server_response;
 
 
     @Override
@@ -233,5 +233,19 @@ public class GameClientActivity extends AppCompatActivity {
             return null;
         }
     }
+
+    public void received_lines(String line){
+        server_response = line;
+        Log.d("LoginActivity, response", server_response);
+        if(server_response.contains("PLAYER")) {
+            LoginActivity.number_of_players++;
+        } else if(server_response.contains("REGISTERED ")) {
+
+        } else if(server_response.contains("WELCOME")){
+            Intent intent = new Intent(this, GameClientActivity.class);
+            startActivity(intent);
+        }
+    }
+
 
 }

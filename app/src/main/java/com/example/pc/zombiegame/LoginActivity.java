@@ -1,5 +1,6 @@
 package com.example.pc.zombiegame;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
@@ -23,7 +24,9 @@ public class LoginActivity extends AppCompatActivity {
     private ServerHandlerThread serverHandlerThread = null;
 
     public static int seq_number = 0;
+    public static int number_of_players;
 
+    private String server_response = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +44,6 @@ public class LoginActivity extends AppCompatActivity {
             serverHandlerThread.execute();
         }
 
-
         loginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -58,9 +60,20 @@ public class LoginActivity extends AppCompatActivity {
 
                 }
 
-
             }
         });
+    }
+
+    public void onClick(View v) {
+            if(v == registerText){
+                String register = "REGISTER " + userText.getText() + " " + pwText.getText();
+
+                final Sender sender = new Sender();
+                if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.HONEYCOMB)
+                    sender.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, register);
+                else
+                    sender.execute();
+            }
     }
 
 
@@ -101,12 +114,26 @@ public class LoginActivity extends AppCompatActivity {
         protected void onPostExecute(Void aVoid) {
 
             super.onPostExecute(aVoid);
+           // send_to_server("LIST-VISIBLE-PLAYERS");
         }
     }
 
+
+
     public void received_lines(String line){
-        registerText.setText(line);
+        server_response = line;
+        Log.d("LoginActivity, response", server_response);
+        if(server_response.contains("PLAYER")) {
+            number_of_players++;
+        } else if(server_response.contains("REGISTERED ")) {
+            registerText.setText("Registration succeed!");
+        } else if(server_response.contains("WELCOME")){
+            Intent intent = new Intent(this, GameClientActivity.class);
+            startActivity(intent);
+        }
     }
+
+
 
 
 

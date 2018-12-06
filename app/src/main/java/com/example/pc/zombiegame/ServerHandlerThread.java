@@ -21,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 //Klass som hanterar trådarna för sändning/hämtning till servern
 public class ServerHandlerThread extends AsyncTask<Void, Void, Void> {
 
+    private RegisterActivity registerActivity;
     private boolean stop = true;
     private Socket socket;
     private PrintWriter printWriter;
@@ -34,7 +35,7 @@ public class ServerHandlerThread extends AsyncTask<Void, Void, Void> {
     //private static final int PORT = 2002;
 
     //TEST SERVER
-    private String DEFAULT_HOST = "192.168.0.158";
+    private String DEFAULT_HOST = "192.168.43.42";
     private static final int PORT = 2002;
 
     public ServerHandlerThread(GameClientActivity parent)
@@ -47,7 +48,11 @@ public class ServerHandlerThread extends AsyncTask<Void, Void, Void> {
     {
         this.loginActivity = parent;
 
+    }
 
+    public ServerHandlerThread(RegisterActivity parent) {
+
+        this.registerActivity = parent;
     }
 
     public void send_message(String line){
@@ -102,13 +107,10 @@ public class ServerHandlerThread extends AsyncTask<Void, Void, Void> {
     @Override
     protected Void doInBackground(Void... arg0) {
 
-
         try {
-
 //            gameClientActivity.print("Ansluter...");
             socket = new Socket(DEFAULT_HOST, PORT);
             setStop(false);
-
 
             if (socket != null) {
                 InputStreamReader inputStreamReader = new InputStreamReader(socket.getInputStream());
@@ -127,10 +129,7 @@ public class ServerHandlerThread extends AsyncTask<Void, Void, Void> {
 //            gameClientActivity.print("Kunde inte ansluta till " + DEFAULT_HOST);
             Log.d("ServerHandlerThread", "Could not Connected");
         }
-
-
         return null;
-
     }
 
     //Körs efter execute, en gång.
@@ -157,8 +156,6 @@ public class ServerHandlerThread extends AsyncTask<Void, Void, Void> {
                             }
                         }
                     }, 0, 1, TimeUnit.SECONDS);
-
-
 
 
             //TODO: LÄGG TILL INLOGGNINGEN HÄR
@@ -197,7 +194,7 @@ public class ServerHandlerThread extends AsyncTask<Void, Void, Void> {
             Receiver receiver = new Receiver();
             receiver.execute();
         } else {
-            gameClientActivity.print("Kunde inte ansluta till " + DEFAULT_HOST);
+         //   gameClientActivity.print("Kunde inte ansluta till " + DEFAULT_HOST);
 
         }
     }
@@ -296,7 +293,10 @@ private class Receiver extends AsyncTask<Void, Void, Void> {
     @Override
     protected void onProgressUpdate(Void... values) {
 //        gameClientActivity.print(receiver_message);
-        loginActivity.received_lines(receiver_message);
+        if(loginActivity != null) loginActivity.received_lines(receiver_message);
+        if(gameClientActivity != null) gameClientActivity.received_lines(receiver_message);
+
+        Log.d("Received_lines", receiver_message);
     }
 } //Receiver Class
 }//ServerHandler class

@@ -4,8 +4,8 @@ import java.net.PasswordAuthentication;
 
 public class Player {
 
-    private static int number_of_players;
-    private int number = ++number_of_players;
+
+    private int number = ++LoginActivity.number_of_players;
     private String username;
     private String password; //TODO: Byt kryptering för lösenord
 
